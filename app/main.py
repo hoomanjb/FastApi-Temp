@@ -2,24 +2,16 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
-from . import models
-from .database import engine, SessionLocal
+from .models import Post
+from .database import engine, get_db, Base
 from sqlalchemy.orm import Session
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-class Post(BaseModel):
+class PostReq(BaseModel):
     title: str
     content: str
     rank: Optional[int] = None
@@ -32,7 +24,7 @@ async def root():
 
 
 @app.get("/posts/{id}")
-async def get_post(post_id: int, db: SessionLocal = Depends(get_db)):
+async def get_post(post_id: int, db: Session = Depends(get_db)):
     post = True
     if not post:
         raise HTTPException(
@@ -42,7 +34,7 @@ async def get_post(post_id: int, db: SessionLocal = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-async def create_posts(post: Post):
+async def create_posts(post: PostReq):
     # do something
     return {'data': post}
 
@@ -56,7 +48,7 @@ async def delete_post(post_id: int):
 
 
 @app.put("/posts/{id}")
-async def update_post(post_id: int, post: Post):
+async def update_post(post_id: int, post: PostReq):
     if post_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post {post_id} Not found")
     return {'message': 'post updated'}
