@@ -6,7 +6,7 @@ from ..schemas import UserCreate, UserResponse
 from ..utils import hashing
 
 
-router = APIRouter(prefix='/users')
+router = APIRouter(prefix='/users', tags=['Users'])
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserResponse)

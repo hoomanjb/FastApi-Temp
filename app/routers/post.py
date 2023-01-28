@@ -6,7 +6,7 @@ from typing import List
 from ..schemas import PostCreate, PostResponse
 
 
-router = APIRouter(prefix='/posts')
+router = APIRouter(prefix='/posts', tags=['Posts'])
 
 
 @router.get("/", response_model=List[PostResponse])
