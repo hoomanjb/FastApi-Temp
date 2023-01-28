@@ -3,8 +3,9 @@ from fastapi.params import Body
 from .models import Post
 from .database import engine, get_db, Base
 from sqlalchemy.orm import Session
+from typing import List
 
-from .schemas import PostCreate
+from .schemas import PostCreate, PostResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,7 +18,13 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/", response_model=List[PostResponse])
+async def get_posts(post_id: int, db: Session = Depends(get_db)):
+    posts = db.query(Post).filter(Post.id == post_id).all()
+    return {'detail': posts}
+
+
+@app.get("/posts/{id}", response_model=PostResponse)
 async def get_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).one_or_none()
     if not post:
