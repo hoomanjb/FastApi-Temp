@@ -4,13 +4,11 @@ from .models import Post, User
 from .database import engine, get_db, Base
 from sqlalchemy.orm import Session
 from typing import List
-
 from .schemas import PostCreate, PostResponse, UserCreate, UserResponse
+from .utils import hashing
 
 Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
-
 
 # /docs - /redoc
 @app.get("/")
@@ -71,8 +69,10 @@ async def update_post(post_id: int, post: PostCreate, db: Session = Depends(get_
 
 @app.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    # hash the password - user.password
+    user.password = hashing(user.password)
     new_user = User(**user.dict())
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {'data': new_user}
+    return new_user
