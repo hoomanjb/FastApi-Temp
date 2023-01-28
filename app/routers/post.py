@@ -6,16 +6,16 @@ from typing import List
 from ..schemas import PostCreate, PostResponse
 
 
-router = APIRouter()
+router = APIRouter(prefix='/posts')
 
 
-@router.get("/posts/", response_model=List[PostResponse])
+@router.get("/", response_model=List[PostResponse])
 async def get_posts(post_id: int, db: Session = Depends(get_db)):
     posts = db.query(Post).filter(Post.id == post_id).all()
     return {'detail': posts}
 
 
-@router.get("/posts/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostResponse)
 async def get_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).one_or_none()
     if not post:
@@ -25,7 +25,7 @@ async def get_post(post_id: int, db: Session = Depends(get_db)):
     return {'detail': post}
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_posts(post: PostCreate, db: Session = Depends(get_db)):
     new_post = Post(title=post.title, content=post.content, published=post.published)
     # new_post = Post(**post.dict())
@@ -37,7 +37,7 @@ async def create_posts(post: PostCreate, db: Session = Depends(get_db)):
     return {'data': new_post}
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id)
 
@@ -48,7 +48,7 @@ async def delete_post(post_id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put("/posts/{id}")
+@router.put("/{id}")
 async def update_post(post_id: int, post: PostCreate, db: Session = Depends(get_db)):
     my_post = db.query(Post).filter(Post.id == post_id)
     pre_post = my_post.first()

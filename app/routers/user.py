@@ -6,10 +6,10 @@ from ..schemas import UserCreate, UserResponse
 from ..utils import hashing
 
 
-router = APIRouter()
+router = APIRouter(prefix='/users')
 
 
-@router.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     # hash the password - user.password
     user.password = hashing(user.password)
