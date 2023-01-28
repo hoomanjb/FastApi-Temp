@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
-from .models import Post
+from .models import Post, User
 from .database import engine, get_db, Base
 from sqlalchemy.orm import Session
 from typing import List
 
-from .schemas import PostCreate, PostResponse
+from .schemas import PostCreate, PostResponse, UserCreate, UserResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -36,7 +36,6 @@ async def get_post(post_id: int, db: Session = Depends(get_db)):
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 async def create_posts(post: PostCreate, db: Session = Depends(get_db)):
-    # do something
     new_post = Post(title=post.title, content=post.content, published=post.published)
     # new_post = Post(**post.dict())
 
@@ -68,3 +67,12 @@ async def update_post(post_id: int, post: PostCreate, db: Session = Depends(get_
     my_post.update(post.dict(), synchronize_session=False)
     db.commit()
     return {'message': 'post updated'}
+
+
+@app.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    new_user = User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {'data': new_user}
