@@ -13,8 +13,8 @@ router = APIRouter(prefix='/posts', tags=['Posts'])
 @router.get("/", response_model=List[PostResponse])
 async def get_posts(
         post_id: int, db: Session = Depends(get_db),
-        user_id: int = Depends(get_current_user)):
-    posts = db.query(Post).filter(Post.id == post_id).filter(Post.user_id == user_id).all()
+        user_id: int = Depends(get_current_user), limit: int = 10):
+    posts = db.query(Post).filter(Post.id == post_id).filter(Post.user_id == user_id).limit(limit).all()
     return {'detail': posts}
 
 
