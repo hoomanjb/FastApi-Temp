@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from ..schemas import PostCreate, PostResponse
 from ..oauth2 import get_current_user
+from typing import Optional
 
 
 router = APIRouter(prefix='/posts', tags=['Posts'])
@@ -13,8 +14,10 @@ router = APIRouter(prefix='/posts', tags=['Posts'])
 @router.get("/", response_model=List[PostResponse])
 async def get_posts(
         post_id: int, db: Session = Depends(get_db),
-        user_id: int = Depends(get_current_user), limit: int = 10):
-    posts = db.query(Post).filter(Post.id == post_id).filter(Post.user_id == user_id).limit(limit).all()
+        user_id: int = Depends(get_current_user),
+        limit: int = 10, skip: int = 0, search: Optional[str] = ''):
+    posts = db.query(Post).filter(Post.id == post_id).filter(
+        Post.user_id == user_id).filter(Post.title.contains(search)).limit(limit).offset(skip).all()
     return {'detail': posts}
 
 
