@@ -8,3 +8,4 @@
 # pip install python-jose[cryptography]
 # pip install alembic
 ### alembic init alembic
+### alembic revision -m 'create post table'
