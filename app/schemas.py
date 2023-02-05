@@ -33,11 +33,10 @@ class PostResponse(PostBase):
         orm_mode = True
 
 
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-
-
 
 
 class UserLogin(BaseModel):
@@ -57,3 +56,10 @@ class TokenData(BaseModel):
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
+
+class PostResponse2(PostBase):
+    post: PostResponse
+    votes: Vote
+
+    class Config:
+        orm_mode = True

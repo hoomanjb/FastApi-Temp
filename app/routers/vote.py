@@ -1,5 +1,5 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
-from ..models import Vote
+from ..models import Vote, Post
 from ..database import get_db
 from sqlalchemy.orm import Session
 from typing import List
@@ -12,9 +12,10 @@ router = APIRouter(prefix='/votes', tags=['Votes'])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def set_vote(
-        vote: Vote, db: Session = Depends(get_db),
-        user_id: int = Depends(get_current_user)):
+async def set_vote(vote: Vote, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+    post = db.query(Post).filter(Post.id == vote.post_id, Vote.user_id == user_id).first()
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='post not found')
     my_vote_query = db.query(Vote).filter(Vote.post_id == vote.post_id, Vote.user_id == user_id)
     my_vote = my_vote_query.first()
     if vote.dir == 1:

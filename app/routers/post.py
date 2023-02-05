@@ -1,12 +1,12 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
-from ..models import Post
+from ..models import Post, Vote
 from ..database import get_db
 from sqlalchemy.orm import Session
 from typing import List
 from ..schemas import PostCreate, PostResponse
 from ..oauth2 import get_current_user
 from typing import Optional
-
+from sqlalchemy import func
 
 router = APIRouter(prefix='/posts', tags=['Posts'])
 
@@ -18,6 +18,11 @@ async def get_posts(
         limit: int = 10, skip: int = 0, search: Optional[str] = ''):
     posts = db.query(Post).filter(Post.id == post_id).filter(
         Post.user_id == user_id).filter(Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    result = db.query(Post, func.count(Vote.post_id).label('votes')).join(
+        Vote, Vote.post_id == Post.id, isouter=True).group_by(Post.id).filter(
+        Post.title.contains(search)).limit(limit).offset(skip).all()
+
     return {'detail': posts}
 
 
