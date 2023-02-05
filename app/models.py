@@ -32,3 +32,13 @@ class User(Base):
     def __init__(self, email, password):
         self.email = email
         self.password = password
+
+
+class Vote(Base):
+    __tablename__ = 'votes'
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
+
+    def __init__(self, user_id, post_id):
+        self.user_id = user_id
+        self.post_id = post_id
