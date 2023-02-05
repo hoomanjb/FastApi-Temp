@@ -130,3 +130,5 @@ dmypy.json
 .idea
 .config/
 config.py
+alembic.ini
+alembic/

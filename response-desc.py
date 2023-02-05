@@ -6,3 +6,5 @@
 # pip install sqlalchemy
 # pip install psycopg2
 # pip install python-jose[cryptography]
+# pip install alembic
+### alembic init alembic
